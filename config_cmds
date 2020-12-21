@@ -1,0 +1,102 @@
+
+sudo setxkbmap -option "caps:swapescape"
+
+pacman git
+
+#yay stuff goes here
+#
+
+
+sudo pacman -S pulseaudio lib32-libpulse lib32-alsa-plugins feh
+yay -S autotiling
+
+
+
+
+#installing zsh
+sudo pacman -Sy zsh
+#setting a couple aliases
+echo 'alias ls='ls --color=auto -l' >> ~/.zshrc
+echo 'alias vi='nvim' >> ~/.zshrc
+
+#installing oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+#installing powerline fonts for agnoster zsh theme
+cd $HOME
+git clone https://github.com/powerline/fonts.git
+
+#installing git repo for zsh history suggestions
+cd $ZSH_CUSTOM/plugins && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+#disable ipv6
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+#updating mirrorlist
+sudo pacman -Sy reflector
+sudo reflector --latest 200 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+sudo pacman -Syu
+
+#install file utilities
+sudo pacman -S file-roller p7zip zip unzip unrar
+
+#install vlc-media-player and associated media codecs
+sudo pacman -Sy vlc
+
+#installing java
+sudo pacman -Sy jre8-openjdk
+
+#check current kernel version
+uname -r
+#installing lts kernel
+sudo pacman -S linux-lts linux-lts-headers
+#reconfiguring grub bootloader
+#then reboot and select lts kernel in GRUB bootup menu
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+#installing microcode for intel processor
+#this software provides stability for the processor and system
+sudo pacman -S intel-ucode && sudo grub-mkconfig -o /boot/grub/grub.cfg
+#disabling grub delay
+#install and enable firewall
+sudo pacman -S ufw
+sudo ufw enable
+sudo ufw status verbose
+
+#remove unused/orphaned packages
+sudo pacman -Rns $ (pacman -Qtdq)
+
+
+#check for failed systemd services
+sudo systemctl --failed
+
+#check for errors in log files
+sudo journalctl -p 3 -xb
+#checking for java packages available for download
+sudo pacman -sS java | grep jre
+#install latest jre
+sudo pacman -S jre-openjdk
+#check for downloadable jdk packages
+sudo pacman -sS java | grep jdk
+#install latest jdk
+sudo pacman -S jdk-openjdk
+
+
+#to hide GRUB menu
+echo '# To achieve faster boot times' >> /etc/default/grub
+echo 'GRUB_FORCE_HIDDEN_MENU="true"' >> /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+#installing pip for python
+sudo pacman -S python-pip
+
+#installing neovim package so that YCM will work (pynvim)
+python3 -m pip install --user --upgrade pynvim
+#installing development kit
+sudo pacman -S jdk8-openjdk
+sudo pacman -S tk
+timedatectl set-timezone America/New_York
+#synchronize clock with remote server
+timedatectl set-ntp yes
+#verify
+timedatectl
